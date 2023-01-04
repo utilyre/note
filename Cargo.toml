@@ -10,3 +10,4 @@ description = "Command line note taker"
 clap = { version = "4.0.32", features = ["derive"] }
 xdg = "2.4.1"
 chrono = "0.4.23"
+chrono-humanize = "0.2.2"

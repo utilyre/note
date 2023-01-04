@@ -3,7 +3,8 @@ use std::{
     io::Write,
 };
 
-use chrono::Local;
+use chrono::{DateTime, Local};
+use chrono_humanize::HumanTime;
 use clap::Parser;
 use xdg::BaseDirectories;
 
@@ -39,13 +40,20 @@ fn main() {
                 .open(notes_path)
                 .unwrap();
 
-            let datetime = Local::now().format("%Y-%m-%d %H:%M:%S");
-            writeln!(notes_file, "{},{}", datetime, add_args.task).unwrap();
+            let dt = Local::now();
+            writeln!(notes_file, "{},{}", dt.to_rfc3339(), add_args.task).unwrap();
         }
 
         Action::Ls => {
-            let contents = fs::read_to_string(notes_path).unwrap();
-            println!("{}", contents);
+            let content = fs::read_to_string(notes_path).unwrap();
+            for (i, line) in content.lines().into_iter().enumerate() {
+                let (rfc3339, task) = line.split_once(",").unwrap();
+
+                let dt = DateTime::parse_from_rfc3339(rfc3339).unwrap();
+                let ht = HumanTime::from(dt);
+
+                println!("{}. {} ({})", i + 1, task, ht);
+            }
         }
     }
 }
